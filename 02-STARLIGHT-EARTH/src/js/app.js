@@ -110,11 +110,21 @@ export default function () {
 
     return star
   }
+
+  const createPoint = () => {
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.1, 20,20),
+      new THREE.MeshBasicMaterial({color: 0xff0000})
+    )
+
+    return mesh
+  }
   const create = () => {
     const earth1 = createEarth1();
     const earth2 = createEarth2();
     const star = createStar(1000);
-    scene.add(earth1, earth2, star);
+    const point = createPoint();
+    scene.add(earth1, earth2, star, point);
 
     return{
       earth1,
