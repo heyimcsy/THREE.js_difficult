@@ -150,12 +150,11 @@ export default function () {
     return mesh
   }
 
-  const createCurve = () => {
+  const createCurve = (pos1, pos2) => {
     // tube geometry 사용할 것이다.
     const curve =  new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-3, 0, 0),
-      new THREE.Vector3(0, 3, 0),
-      new THREE.Vector3(3, 0, 0),
+      pos1 ,
+      pos2
     ]);
     const geometry = new THREE.TubeGeometry(
       curve,
@@ -177,7 +176,7 @@ export default function () {
     const star = createStar(1000);
     const point1 = createPoint1();
     const point2 = createPoint2();
-    const curve = createCurve();
+    const curve = createCurve(point1.position, point2.position);
 
     scene.add(earth1, earth2, star, point1, point2, curve);
 
