@@ -118,10 +118,21 @@ export default function () {
       lng: 126.97841 * (Math.PI / 180)
     }
 
+    function convertLatLngToPos(pos, radius) {
+      const x = Math.cos(pos.lat) * Math.sin(pos.lng) * radius;
+      const y = Math.sin(pos.lat) * radius;
+      const z = Math.cos(pos.lat) * Math.cos(pos.lng) * radius;
+
+      return {x, y, z};
+    }
+
+    const position = convertLatLngToPos(point, 1.3);
+
     const mesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.1, 20,20),
       new THREE.MeshBasicMaterial({color: 0xff0000})
-    )
+    );
+    mesh.position.set(position.x, position.y, position.z)
 
     return mesh
   }
