@@ -83,11 +83,35 @@ export default function () {
     return mesh
   }
 
+  const createStar = (count ) => {
+    const positions = new Float32Array(count * 3);
+    for(let i = 0; i <= count; i++){
+      positions[i] = (Math.random() - 0.5) * 5;
+      positions[i + 1] =(Math.random() - 0.5) * 5;
+      positions[i + 2] = (Math.random() - 0.5) * 5;
+    }
+
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(positions, 3)
+    );
+
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 0.1,
+      transparent: true,
+      map: textureLoader.load('assets/particle.png')
+    })
+
+    const star = new THREE.Points(particleGeometry, particleMaterial);
+
+    return star
+  }
   const create = () => {
     const earth1 = createEarth1();
     const earth2 = createEarth2();
-
-    scene.add(earth1, earth2);
+    const star = createStar(1000);
+    scene.add(earth1, earth2, star);
   }
 
   const resize = () => {
