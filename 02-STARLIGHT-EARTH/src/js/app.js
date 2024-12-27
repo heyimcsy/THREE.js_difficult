@@ -151,11 +151,17 @@ export default function () {
   }
 
   const createCurve = (pos1, pos2) => {
+    const points = [];
+    for(let i = 0;  i <= 100; i++){
+      const pos = new THREE.Vector3().lerpVectors(pos1, pos2, i/100);
+      pos.normalize();
+      const wave = Math.sin((Math.PI * i) / 100);
+
+      pos. multiplyScalar(1.3 + 0.4 * wave)
+      points.push(pos);
+    }
     // tube geometry 사용할 것이다.
-    const curve =  new THREE.CatmullRomCurve3([
-      pos1 ,
-      pos2
-    ]);
+    const curve =  new THREE.CatmullRomCurve3(points);
     const geometry = new THREE.TubeGeometry(
       curve,
       20,
