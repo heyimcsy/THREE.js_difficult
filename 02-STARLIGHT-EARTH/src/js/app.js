@@ -100,7 +100,8 @@ export default function () {
     const particleMaterial = new THREE.PointsMaterial({
       size: 0.1,
       transparent: true,
-      map: textureLoader.load('assets/particle.png')
+      map: textureLoader.load('assets/particle.png'),
+      alphaMap: textureLoader.load('assets/particle.png')
     })
 
     const star = new THREE.Points(particleGeometry, particleMaterial);
