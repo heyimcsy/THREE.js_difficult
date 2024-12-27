@@ -112,6 +112,12 @@ export default function () {
   }
 
   const createPoint = () => {
+    //좌표값을 라디안으로 변경해주어야 한다.
+    const point = {
+      lat: 37.56668 * (Math.PI / 180),
+      lng: 126.97841 * (Math.PI / 180)
+    }
+
     const mesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.1, 20,20),
       new THREE.MeshBasicMaterial({color: 0xff0000})
@@ -150,14 +156,14 @@ export default function () {
 
   const draw = (obj) => {
     const {earth1, earth2, star} = obj;
-    earth1.rotation.x += 0.0005;
-    earth1.rotation.y += 0.0005;
-
-    earth2.rotation.x += 0.0005;
-    earth2.rotation.y += 0.0005;
-
-    star.rotation.x += 0.001;
-    star.rotation.y += 0.001;
+    // earth1.rotation.x += 0.0005;
+    // earth1.rotation.y += 0.0005;
+    //
+    // earth2.rotation.x += 0.0005;
+    // earth2.rotation.y += 0.0005;
+    //
+    // star.rotation.x += 0.001;
+    // star.rotation.y += 0.001;
 
     controls.update();
     renderer.render(scene, camera);
