@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import {convertLatLngToPos} from '../js/utils.js'
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
