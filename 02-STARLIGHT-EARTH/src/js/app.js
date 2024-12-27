@@ -64,6 +64,7 @@ export default function () {
     const geometry = new THREE.SphereGeometry(1.3, 30, 30)
 
     const mesh = new THREE.Mesh(geometry, material)
+    mesh.rotation.y = - Math.PI / 2;
 
     return mesh
   };
@@ -79,6 +80,7 @@ export default function () {
     const geometry = new THREE.SphereGeometry(1.5, 30,30)
 
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.y = - Math.PI / 2;
 
     return mesh
   }
@@ -129,7 +131,7 @@ export default function () {
     const position = convertLatLngToPos(point, 1.3);
 
     const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.1, 20,20),
+      new THREE.SphereGeometry(0.03, 20,20),
       new THREE.MeshBasicMaterial({color: 0xff0000})
     );
     mesh.position.set(position.x, position.y, position.z)
