@@ -150,13 +150,36 @@ export default function () {
     return mesh
   }
 
+  const createCurve = () => {
+    // tube geometry 사용할 것이다.
+    const curve =  new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-3, 0, 0),
+      new THREE.Vector3(0, 3, 0),
+      new THREE.Vector3(3, 0, 0),
+    ]);
+    const geometry = new THREE.TubeGeometry(
+      curve,
+      20,
+      0.01,
+    )
+
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xffffff
+    })
+    const mesh = new THREE.Mesh(geometry, material);
+
+    return mesh
+  }
+
   const create = () => {
     const earth1 = createEarth1();
     const earth2 = createEarth2();
     const star = createStar(1000);
     const point1 = createPoint1();
     const point2 = createPoint2();
-    scene.add(earth1, earth2, star, point1, point2);
+    const curve = createCurve();
+
+    scene.add(earth1, earth2, star, point1, point2, curve);
 
     return{
       earth1,
