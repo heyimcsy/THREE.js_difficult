@@ -62,7 +62,7 @@ export default function () {
     })
 
     //sphere geometry 는 동그란 물체를 형성할 때 제일 많이 사용한다.
-    const geometry = new THREE.SphereGeometry(1.3, 30, 30)
+    const geometry = new THREE.SphereGeometry(1.3, 50, 50)
 
     const mesh = new THREE.Mesh(geometry, material)
     mesh.rotation.y = - Math.PI / 2;
@@ -78,7 +78,7 @@ export default function () {
       side: THREE.BackSide,
     })
 // side는 mesh의 어느 방면을 렌더링 할 것인지 결정하는 옵션 FrontSide, BackSide
-    const geometry = new THREE.SphereGeometry(1.5, 30,30)
+    const geometry = new THREE.SphereGeometry(1.5, 50,50)
 
     const mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.y = - Math.PI / 2;
