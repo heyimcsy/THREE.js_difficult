@@ -8,6 +8,17 @@ export default function () {
 
   renderer.outputEncoding = THREE.sRGBEncoding;
   const textureLoader = new THREE.TextureLoader();
+  const cubeTextLoader = new THREE.CubeTextureLoader();
+  const environmentMap = cubeTextLoader.load([
+    'assets/environments/px.png',
+    'assets/environments/nx.png',
+    'assets/environments/py.png',
+    'assets/environments/ny.png',
+    'assets/environments/pz.png',
+    'assets/environments/nz.png',
+  ]);
+
+  environmentMap.encoding = THREE.sRGBEncoding;
 
   const container = document.querySelector('#container');
 
@@ -19,6 +30,9 @@ export default function () {
   };
 
   const scene = new THREE.Scene();
+  scene.background = environmentMap;
+  scene.environment = environmentMap;
+
   const camera = new THREE.PerspectiveCamera(
     75,
     canvasSize.width / canvasSize.height,
@@ -41,14 +55,40 @@ export default function () {
     // MeshBasicMaterial     or MeshStandardMaterial 조명이 필요하다
     const material = new THREE.MeshStandardMaterial({
       map: textureLoader.load('assets/earth-night-map.jpg'),
+      side: THREE.FrontSide,
+      opacity: 0.6,
+      transparent: true,
     })
 
     //sphere geometry 는 동그란 물체를 형성할 때 제일 많이 사용한다.
     const geometry = new THREE.SphereGeometry(1.3, 30, 30)
 
     const mesh = new THREE.Mesh(geometry, material)
-    scene.add(mesh)
+
+    return mesh
   };
+
+  const createEarth2 = () => {
+    const material = new THREE.MeshStandardMaterial({
+      map: textureLoader.load('assets/earth-night-map.jpg'),
+      opacity: 0.9,
+      transparent: true,
+      side: THREE.BackSide,
+    })
+// side는 mesh의 어느 방면을 렌더링 할 것인지 결정하는 옵션 FrontSide, BackSide
+    const geometry = new THREE.SphereGeometry(1.5, 30,30)
+
+    const mesh = new THREE.Mesh(geometry, material);
+
+    return mesh
+  }
+
+  const create = () => {
+    const earth1 = createEarth1();
+    const earth2 = createEarth2();
+
+    scene.add(earth1, earth2);
+  }
 
   const resize = () => {
     canvasSize.width = window.innerWidth;
@@ -75,7 +115,7 @@ export default function () {
 
   const initialize = () => {
     addLight();
-    createEarth1();
+    create();
     addEvent();
     resize();
     draw();
