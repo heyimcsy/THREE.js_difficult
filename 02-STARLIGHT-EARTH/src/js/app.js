@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { convertLatLngToPos } from './utils.js';
+import { convertLatLngToPos, getGradientCanvas } from './utils.js';
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
@@ -124,10 +124,11 @@ export default function () {
     const position = convertLatLngToPos(point, 1.3);
 
     const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.03, 20,20),
-      new THREE.MeshBasicMaterial({color: 0xff0000})
+      new THREE.TorusGeometry(0.04, 0.002,20, 20),
+      new THREE.MeshBasicMaterial({color: 0x263d64})
     );
     mesh.position.set(position.x, position.y, position.z)
+    mesh.rotation.set(0.9, 2.46, 1)
 
     return mesh
   }
@@ -142,8 +143,8 @@ export default function () {
     const position = convertLatLngToPos(point, 1.3);
 
     const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.03, 20,20),
-      new THREE.MeshBasicMaterial({color: 0xff0000})
+      new THREE.TorusGeometry(0.04, 0.002,20, 20),
+      new THREE.MeshBasicMaterial({color: 0x263d64})
     );
     mesh.position.set(position.x, position.y, position.z)
 
@@ -168,8 +169,12 @@ export default function () {
       0.01,
     )
 
+    const gradientCanvas = getGradientCanvas('#757F94', '#263D74')
+    const texture =  new THREE.CanvasTexture(gradientCanvas);
+
     const material = new THREE.MeshBasicMaterial({
-      color: 0xffffff
+      // color: 0x263d64
+      map: texture
     })
     const mesh = new THREE.Mesh(geometry, material);
 
@@ -210,14 +215,14 @@ export default function () {
 
   const draw = (obj) => {
     const {earth1, earth2, star} = obj;
-    // earth1.rotation.x += 0.0005;
-    // earth1.rotation.y += 0.0005;
-    //
-    // earth2.rotation.x += 0.0005;
-    // earth2.rotation.y += 0.0005;
-    //
-    // star.rotation.x += 0.001;
-    // star.rotation.y += 0.001;
+    earth1.rotation.x += 0.0005;
+    earth1.rotation.y += 0.0005;
+
+    earth2.rotation.x += 0.0005;
+    earth2.rotation.y += 0.0005;
+
+    star.rotation.x += 0.001;
+    star.rotation.y += 0.001;
 
     controls.update();
     renderer.render(scene, camera);
