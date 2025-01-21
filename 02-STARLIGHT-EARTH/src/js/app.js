@@ -8,6 +8,7 @@ import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectio
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
 import { AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass.js';
+import { HalftonePass } from 'three/examples/jsm/postprocessing/HalftonePass.js';
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
@@ -68,7 +69,7 @@ export default function () {
     effectComposer.addPass(renderPass);
 
     //노이즈 효과를 넣어 주는데 0~1 사이로 넣어 주면 된다.
-    // const filmPass = new FilmPass(1, 1, 4096, false);
+    const filmPass = new FilmPass(1, 1, 4096, false);
     //직접 속성에 접근해서 value 값을 적용해줄 수 있다.
     // filmPass.uniforms.nIntensity.value = 1;
     // filmPass.uniforms.sIntensity.value = 0.7;
@@ -79,7 +80,7 @@ export default function () {
     const shaderPass = new ShaderPass(GammaCorrectionShader);
     //화면 전체 지지직 거리는 효과 <고장난 CCTV 느낌내기 좋을 것 같다. goWild는 더 고장난 느낌
 
-    // const glitchPass = new GlitchPass();
+    const glitchPass = new GlitchPass();
     // effectComposer.addPass(glitchPass);
     // glitchPass.goWild = true;
 
@@ -87,8 +88,21 @@ export default function () {
     //큰 숫자가 들어갈 수록 잔상이 길게 남는다.
     const afterImagePass = new AfterimagePass(0.96);
 
-    effectComposer.addPass(afterImagePass)
+    // effectComposer.addPass(afterImagePass)
     effectComposer.addPass(shaderPass);
+
+    const halftonePass = new HalftonePass(
+      canvasSize.width,
+      canvasSize.height,
+      {
+        radius: 10,
+        shape: 1,
+        scatter: 0,
+        blending: 0.5,
+
+      }
+    );
+    effectComposer.addPass(halftonePass);
   }
 
   const createEarth1 = () => {
