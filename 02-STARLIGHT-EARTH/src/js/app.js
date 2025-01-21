@@ -10,16 +10,32 @@ import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
 import { AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass.js';
 import { HalftonePass } from 'three/examples/jsm/postprocessing/HalftonePass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+import {SMAAPass} from 'three/examples/jsm/postprocessing/SMAAPass.js';
 
 export default function () {
+  const canvasSize = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
   });
 
   renderer.outputEncoding = THREE.sRGBEncoding;
 
+  //안티 엘리엇 작업 점과 점 사이를 더 매끄럽게 만들어 준 것
+  const renderTarget = new THREE.WebGLRenderTarget(
+    canvasSize.width,
+    canvasSize.height,
+    {
+      samples: 2
+    }
+  )
+
   const effectComposer = new EffectComposer(
-    renderer
+    renderer, renderTarget
   )
   const textureLoader = new THREE.TextureLoader();
   const cubeTextLoader = new THREE.CubeTextureLoader();
@@ -38,14 +54,9 @@ export default function () {
 
   container.appendChild(renderer.domElement);
 
-  const canvasSize = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-  };
-
   const scene = new THREE.Scene();
-  // scene.background = environmentMap;
-  // scene.environment = environmentMap;
+  scene.background = environmentMap;
+  scene.environment = environmentMap;
 
   const camera = new THREE.PerspectiveCamera(
     75,
@@ -65,7 +76,8 @@ export default function () {
     scene.add(light)
   }
 
-  const addPostEffects = () => {
+  const addPostEffects = (obj) => {
+    const { earthGroup } = obj;
     const renderPass = new RenderPass(scene, camera);
     effectComposer.addPass(renderPass);
 
@@ -113,8 +125,23 @@ export default function () {
     // unRealBloomPass.threshold = 0.1;
     // unRealBloomPass.radius = 1.5;
 
-    effectComposer.addPass(unRealBloomPass);
-    // effectComposer.addPass(shaderPass);
+    // effectComposer.addPass(unRealBloomPass);
+    effectComposer.addPass(shaderPass);
+
+    const outlinePass = new OutlinePass(
+      new THREE.Vector2(canvasSize.width, canvasSize.height),
+      scene,
+      camera
+    );
+    outlinePass.selectedObjects = [...earthGroup.children];
+    outlinePass.edgeStrength = 5;
+    outlinePass.edgeGlow = 5;
+    outlinePass.pulsePeriod = 5;
+
+    effectComposer.addPass(outlinePass);
+
+    const smaaPass =new SMAAPass();
+    effectComposer.addPass(smaaPass);
   }
 
   const createEarth1 = () => {
@@ -127,7 +154,7 @@ export default function () {
     })
 
     //sphere geometry 는 동그란 물체를 형성할 때 제일 많이 사용한다.
-    const geometry = new THREE.SphereGeometry(1.3, 50, 50)
+    const geometry = new THREE.SphereGeometry(1.3, 30, 30)
 
     const mesh = new THREE.Mesh(geometry, material)
     mesh.rotation.y = - Math.PI / 2;
@@ -143,7 +170,7 @@ export default function () {
       side: THREE.BackSide,
     })
 // side는 mesh의 어느 방면을 렌더링 할 것인지 결정하는 옵션 FrontSide, BackSide
-    const geometry = new THREE.SphereGeometry(1.5, 50,50)
+    const geometry = new THREE.SphereGeometry(1.5, 30,30)
 
     const mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.y = - Math.PI / 2;
@@ -299,8 +326,9 @@ export default function () {
 
   const initialize = () => {
     const obj = create();
+
     addLight();
-    addPostEffects();
+    addPostEffects(obj);
     addEvent();
     resize();
     draw(obj);
