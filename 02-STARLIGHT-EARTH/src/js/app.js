@@ -9,6 +9,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
 import { AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass.js';
 import { HalftonePass } from 'three/examples/jsm/postprocessing/HalftonePass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
@@ -43,8 +44,8 @@ export default function () {
   };
 
   const scene = new THREE.Scene();
-  scene.background = environmentMap;
-  scene.environment = environmentMap;
+  // scene.background = environmentMap;
+  // scene.environment = environmentMap;
 
   const camera = new THREE.PerspectiveCamera(
     75,
@@ -89,8 +90,6 @@ export default function () {
     const afterImagePass = new AfterimagePass(0.96);
 
     // effectComposer.addPass(afterImagePass)
-    effectComposer.addPass(shaderPass);
-
     const halftonePass = new HalftonePass(
       canvasSize.width,
       canvasSize.height,
@@ -102,7 +101,20 @@ export default function () {
 
       }
     );
-    effectComposer.addPass(halftonePass);
+
+    // effectComposer.addPass(halftonePass);
+    const unRealBloomPass = new UnrealBloomPass(
+      new THREE.Vector2(canvasSize.width, canvasSize.height),
+      10,
+      0.9,
+      0.03
+    );
+    // unRealBloomPass.strength = 1;
+    // unRealBloomPass.threshold = 0.1;
+    // unRealBloomPass.radius = 1.5;
+
+    effectComposer.addPass(unRealBloomPass);
+    // effectComposer.addPass(shaderPass);
   }
 
   const createEarth1 = () => {
