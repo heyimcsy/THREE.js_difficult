@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { convertLatLngToPos, getGradientCanvas } from './utils.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 
 export default function () {
   const renderer = new THREE.WebGLRenderer({
@@ -8,6 +13,10 @@ export default function () {
   });
 
   renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const effectComposer = new EffectComposer(
+    renderer
+  )
   const textureLoader = new THREE.TextureLoader();
   const cubeTextLoader = new THREE.CubeTextureLoader();
   const environmentMap = cubeTextLoader.load([
@@ -50,6 +59,23 @@ export default function () {
     const light = new THREE.DirectionalLight(0xffffff);
     light.position.set(2.65, 2.13, 1.02)
     scene.add(light)
+  }
+
+  const addPostEffects = () => {
+    const renderPass = new RenderPass(scene, camera);
+    effectComposer.addPass(renderPass);
+
+    //노이즈 효과를 넣어 주는데 0~1 사이로 넣어 주면 된다.
+    const filmPass = new FilmPass(1, 1, 4096, false);
+    //직접 속성에 접근해서 value 값을 적용해줄 수 있다.
+    // filmPass.uniforms.nIntensity.value = 1;
+    // filmPass.uniforms.sIntensity.value = 0.7;
+    // filmPass.uniforms.sCount.value = 1000;
+    // filmPass.uniforms.grayscale.value = true;
+    effectComposer.addPass(filmPass);
+
+    const shaderPass = new ShaderPass(GammaCorrectionShader);
+    effectComposer.addPass(shaderPass);
   }
 
   const createEarth1 = () => {
@@ -208,6 +234,7 @@ export default function () {
 
     renderer.setSize(canvasSize.width, canvasSize.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    effectComposer.setSize(canvasSize.width, canvasSize.height);
   };
 
   const addEvent = () => {
@@ -223,15 +250,18 @@ export default function () {
     star.rotation.y += 0.001;
 
     controls.update();
-    renderer.render(scene, camera);
+    effectComposer.render();
+
+    // renderer.render(scene, camera);
     requestAnimationFrame(() => {
       draw(obj);
     });
   };
 
   const initialize = () => {
-    addLight();
     const obj = create();
+    addLight();
+    addPostEffects();
     addEvent();
     resize();
     draw(obj);
