@@ -18,6 +18,8 @@ export default function () {
     height: window.innerHeight,
   };
 
+  const clock = new THREE.Clock();
+
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
   });
@@ -91,19 +93,15 @@ export default function () {
     // vertex 영역, 클릭 부분을 만드는 shader  , fragment 픽셀마다 색을 입히는 shader
     const customShaderPass = new ShaderPass({
       uniforms:{
-        uBrightness: { value: 1 },
+        uBrightness: { value: 0.3 },
         uPosition: { value: new THREE.Vector2(0, 0)},
-        uColor: { value: new THREE.Vector3(0,0,0.3) },
+        uColor: { value: new THREE.Vector3(0,0,0.15) },
         uAlpha: { value: 0.5 },
         tDiffuse: { value: null },
       },
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
     });
-    gui.add(customShaderPass.uniforms.uPosition.value, 'x', -1, 1, 0.01);
-    gui.add(customShaderPass.uniforms.uPosition.value, 'y', -1, 1, 0.01);
-    gui.add(customShaderPass.uniforms.uBrightness, 'value', 0, 1, 0.01)
-      .name('brightness');
     effectComposer.addPass(customShaderPass);
 
     const unRealBloomPass = new UnrealBloomPass(
@@ -266,6 +264,7 @@ export default function () {
 
     return{
       earthGroup,
+      curve,
       star
     }
   }
@@ -287,15 +286,24 @@ export default function () {
   };
 
   const draw = (obj) => {
-    const {earthGroup,  star} = obj;
+    const {earthGroup, curve, star} = obj;
+
     earthGroup.rotation.x += 0.0005;
+
     earthGroup.rotation.y += 0.0005;
-
     star.rotation.x += 0.001;
-    star.rotation.y += 0.001;
 
+    star.rotation.y += 0.001;
     controls.update();
+
     effectComposer.render();
+
+    const timeElapsed = clock.getElapsedTime();
+    let drawRangeCount = curve.geometry.drawRange.count;
+    const progress = timeElapsed / 2.5;
+    const speed =  3;
+    drawRangeCount = progress * 960 * 3;
+    curve.geometry.setDrawRange(0, drawRangeCount);
 
     // renderer.render(scene, camera);
     requestAnimationFrame(() => {
