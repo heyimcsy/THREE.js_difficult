@@ -112,7 +112,9 @@ export default function () {
         varying vec2 vUv;
         
         void main(){
-          vec4 tex = texture2D(tDiffuse, vUv);
+        //위치가 바뀐다. 왜곡효과를 줄 때 사용하기 좋다.
+          vec2 newUV = vec2(vUv.x +0.4, vUv.y + 0.1);
+          vec4 tex = texture2D(tDiffuse, newUV);
           // tex.r *= 2.0;
           tex.rgb += uColor;
           
@@ -120,9 +122,6 @@ export default function () {
         }
       `,
     });
-    gui.add(customShaderPass.uniforms.uColor.value, 'x', -1, 1, 0.01);
-    gui.add(customShaderPass.uniforms.uColor.value, 'y', -1, 1, 0.01);
-    gui.add(customShaderPass.uniforms.uColor.value, 'z', -1, 1, 0.01);
 
     effectComposer.addPass(customShaderPass);
 
