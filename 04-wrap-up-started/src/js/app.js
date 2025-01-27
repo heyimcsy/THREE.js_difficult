@@ -9,6 +9,8 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import {SMAAPass} from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import dat from 'dat.gui';
+import vertexShader from '../shaders/vertex.glsl';
+import fragmentShader from '../shaders/fragment.glsl';
 
 export default function () {
   const canvasSize = {
@@ -95,36 +97,8 @@ export default function () {
         uAlpha: { value: 0.5 },
         tDiffuse: { value: null },
       },
-      vertexShader: `
-        varying vec2 vPosition;
-        varying vec2 vUv;
-        
-        void main(){
-          gl_Position = vec4(position.x, position.y, 0.0, 1.0);
-          vPosition = position.xy;
-          vUv = uv;
-        }
-        `,
-      fragmentShader: `
-        uniform float uBrightness;
-        uniform vec2 uPosition;
-        uniform vec3 uColor;
-        uniform float uAlpha;
-        uniform sampler2D tDiffuse;
-        
-        varying vec2 vPosition;
-        varying vec2 vUv;
-        
-        void main(){
-        //위치가 바뀐다. 왜곡효과를 줄 때 사용하기 좋다.
-          vec2 newUV = vec2(vUv.x, vUv.y);
-          vec4 tex = texture2D(tDiffuse, newUV);
-          tex.rgb += uColor;
-          float brightness = sin(uBrightness + vUv.x);
-          
-          gl_FragColor = tex / brightness;
-        }
-      `,
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
     });
     gui.add(customShaderPass.uniforms.uPosition.value, 'x', -1, 1, 0.01);
     gui.add(customShaderPass.uniforms.uPosition.value, 'y', -1, 1, 0.01);
