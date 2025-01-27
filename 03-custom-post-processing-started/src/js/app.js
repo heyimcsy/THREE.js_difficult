@@ -86,8 +86,9 @@ export default function () {
     // vertex 영역, 클릭 부분을 만드는 shader  , fragment 픽셀마다 색을 입히는 shader
     const customShaderPass = new ShaderPass({
       uniforms:{
-        uColor: { value: new THREE.Vector3(0,0,1)},
-        uAlpha: { value: 0.5 }
+        uColor: { value: new THREE.Vector3(0,0,1) },
+        uAlpha: { value: 0.5 },
+        tDiffuse: { value: null },
       },
       vertexShader: `
         varying vec2 vPosition;
@@ -102,11 +103,17 @@ export default function () {
       fragmentShader: `
         uniform vec3 uColor;
         uniform float uAlpha;
+        uniform sampler2D tDiffuse;
+        
         varying vec2 vPosition;
         varying vec2 vUv;
         
         void main(){
-          gl_FragColor = vec4(uColor, uAlpha);
+          vec4 tex = texture2D(tDiffuse, vUv);
+          // tex.r *= 2.0;
+          tex.rb += vUv;
+          
+          gl_FragColor = tex;
         }
       `,
     })
