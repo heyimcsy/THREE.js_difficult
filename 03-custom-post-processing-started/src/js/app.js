@@ -115,7 +115,7 @@ export default function () {
         
         void main(){
         //위치가 바뀐다. 왜곡효과를 줄 때 사용하기 좋다.
-          vec2 newUV = vec2(vUv.x + uPosition.x, vUv.y + uPosition.y);
+          vec2 newUV = vec2(vUv.x, vUv.y + sin(vUv.x * 20.0) * 0.1 + uPosition.y);
           vec4 tex = texture2D(tDiffuse, newUV);
           // tex.r *= 2.0;
           tex.rgb += uColor;
