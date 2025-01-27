@@ -89,6 +89,7 @@ export default function () {
     // vertex 영역, 클릭 부분을 만드는 shader  , fragment 픽셀마다 색을 입히는 shader
     const customShaderPass = new ShaderPass({
       uniforms:{
+        uBrightness: { value: 1 },
         uPosition: { value: new THREE.Vector2(0, 0)},
         uColor: { value: new THREE.Vector3(0,0,0.3) },
         uAlpha: { value: 0.5 },
@@ -105,6 +106,7 @@ export default function () {
         }
         `,
       fragmentShader: `
+        uniform float uBrightness;
         uniform vec2 uPosition;
         uniform vec3 uColor;
         uniform float uAlpha;
@@ -115,17 +117,19 @@ export default function () {
         
         void main(){
         //위치가 바뀐다. 왜곡효과를 줄 때 사용하기 좋다.
-          vec2 newUV = vec2(vUv.x, vUv.y + sin(vUv.x * 20.0) * 0.1 + uPosition.y);
+          vec2 newUV = vec2(vUv.x, vUv.y + cos(vUv.x * 20.0) * 0.1 + uPosition.y);
           vec4 tex = texture2D(tDiffuse, newUV);
-          // tex.r *= 2.0;
           tex.rgb += uColor;
+          float brightness = 2.0;
           
-          gl_FragColor = tex;
+          gl_FragColor = tex / uBrightness;
         }
       `,
     });
     gui.add(customShaderPass.uniforms.uPosition.value, 'x', -1, 1, 0.01);
     gui.add(customShaderPass.uniforms.uPosition.value, 'y', -1, 1, 0.01);
+    gui.add(customShaderPass.uniforms.uBrightness, 'value', 0, 1, 0.01)
+      .name('brightness');
     effectComposer.addPass(customShaderPass);
 
     const unRealBloomPass = new UnrealBloomPass(
