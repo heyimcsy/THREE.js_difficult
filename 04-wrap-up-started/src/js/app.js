@@ -72,6 +72,7 @@ export default function () {
   controls.dampingFactor = 0.1;
 
   const gui = new dat.GUI();
+  gui.hide();
 
   const addLight = () => {
     const light = new THREE.DirectionalLight(0xffffff);
@@ -85,7 +86,8 @@ export default function () {
     effectComposer.addPass(renderPass);
 
     //노이즈 효과를 넣어 주는데 0~1 사이로 넣어 주면 된다.
-    const filmPass = new FilmPass(1, 1, 4096, false);
+    const filmPass = new FilmPass(1, 1, 2000, false);
+    effectComposer.addPass(filmPass);
 
     const shaderPass = new ShaderPass(GammaCorrectionShader);
     //화면 전체 지지직 거리는 효과 <고장난 CCTV 느낌내기 좋을 것 같다. goWild는 더 고장난 느낌
@@ -110,11 +112,11 @@ export default function () {
       0.9,
       0.03
     );
-    // unRealBloomPass.strength = 1;
-    // unRealBloomPass.threshold = 0.1;
-    // unRealBloomPass.radius = 1.5;
+    unRealBloomPass.strength = 0.4;
+    unRealBloomPass.threshold = 0.2;
+    unRealBloomPass.radius = 0.7;
 
-    // effectComposer.addPass(unRealBloomPass);
+    effectComposer.addPass(unRealBloomPass);
     effectComposer.addPass(shaderPass);
 
     const smaaPass =new SMAAPass();
