@@ -117,12 +117,12 @@ export default function () {
         
         void main(){
         //위치가 바뀐다. 왜곡효과를 줄 때 사용하기 좋다.
-          vec2 newUV = vec2(vUv.x, vUv.y + cos(vUv.x * 20.0) * 0.1 + uPosition.y);
+          vec2 newUV = vec2(vUv.x, vUv.y);
           vec4 tex = texture2D(tDiffuse, newUV);
           tex.rgb += uColor;
-          float brightness = 2.0;
+          float brightness = sin(uBrightness + vUv.x);
           
-          gl_FragColor = tex / uBrightness;
+          gl_FragColor = tex / brightness;
         }
       `,
     });
