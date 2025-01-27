@@ -6,11 +6,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
 import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
-import { AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass.js';
-import { HalftonePass } from 'three/examples/jsm/postprocessing/HalftonePass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import {SMAAPass} from 'three/examples/jsm/postprocessing/SMAAPass.js';
 
 export default function () {
@@ -83,38 +79,39 @@ export default function () {
 
     //노이즈 효과를 넣어 주는데 0~1 사이로 넣어 주면 된다.
     const filmPass = new FilmPass(1, 1, 4096, false);
-    //직접 속성에 접근해서 value 값을 적용해줄 수 있다.
-    // filmPass.uniforms.nIntensity.value = 1;
-    // filmPass.uniforms.sIntensity.value = 0.7;
-    // filmPass.uniforms.sCount.value = 1000;
-    // filmPass.uniforms.grayscale.value = true;
-    // effectComposer.addPass(filmPass);
 
     const shaderPass = new ShaderPass(GammaCorrectionShader);
     //화면 전체 지지직 거리는 효과 <고장난 CCTV 느낌내기 좋을 것 같다. goWild는 더 고장난 느낌
 
-    const glitchPass = new GlitchPass();
-    // effectComposer.addPass(glitchPass);
-    // glitchPass.goWild = true;
+    // vertex 영역, 클릭 부분을 만드는 shader  , fragment 픽셀마다 색을 입히는 shader
+    const customShaderPass = new ShaderPass({
+      uniforms:{
+        uColor: { value: new THREE.Vector3(0,0,1)},
+        uAlpha: { value: 0.5 }
+      },
+      vertexShader: `
+        varying vec2 vPosition;
+        varying vec2 vUv;
+        
+        void main(){
+          gl_Position = vec4(position.x, position.y, 0.0, 1.0);
+          vPosition = position.xy;
+          vUv = uv;
+        }
+        `,
+      fragmentShader: `
+        uniform vec3 uColor;
+        uniform float uAlpha;
+        varying vec2 vPosition;
+        varying vec2 vUv;
+        
+        void main(){
+          gl_FragColor = vec4(uColor, uAlpha);
+        }
+      `,
+    })
+    effectComposer.addPass(customShaderPass);
 
-
-    //큰 숫자가 들어갈 수록 잔상이 길게 남는다.
-    const afterImagePass = new AfterimagePass(0.96);
-
-    // effectComposer.addPass(afterImagePass)
-    const halftonePass = new HalftonePass(
-      canvasSize.width,
-      canvasSize.height,
-      {
-        radius: 10,
-        shape: 1,
-        scatter: 0,
-        blending: 0.5,
-
-      }
-    );
-
-    // effectComposer.addPass(halftonePass);
     const unRealBloomPass = new UnrealBloomPass(
       new THREE.Vector2(canvasSize.width, canvasSize.height),
       10,
@@ -127,18 +124,6 @@ export default function () {
 
     // effectComposer.addPass(unRealBloomPass);
     effectComposer.addPass(shaderPass);
-
-    const outlinePass = new OutlinePass(
-      new THREE.Vector2(canvasSize.width, canvasSize.height),
-      scene,
-      camera
-    );
-    outlinePass.selectedObjects = [...earthGroup.children];
-    outlinePass.edgeStrength = 5;
-    outlinePass.edgeGlow = 5;
-    outlinePass.pulsePeriod = 5;
-
-    effectComposer.addPass(outlinePass);
 
     const smaaPass =new SMAAPass();
     effectComposer.addPass(smaaPass);
