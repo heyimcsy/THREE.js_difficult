@@ -8,6 +8,7 @@ import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectio
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import {SMAAPass} from 'three/examples/jsm/postprocessing/SMAAPass.js';
+import dat from 'dat.gui';
 
 export default function () {
   const canvasSize = {
@@ -66,6 +67,8 @@ export default function () {
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
 
+  const gui = new dat.GUI();
+
   const addLight = () => {
     const light = new THREE.DirectionalLight(0xffffff);
     light.position.set(2.65, 2.13, 1.02)
@@ -86,7 +89,7 @@ export default function () {
     // vertex 영역, 클릭 부분을 만드는 shader  , fragment 픽셀마다 색을 입히는 shader
     const customShaderPass = new ShaderPass({
       uniforms:{
-        uColor: { value: new THREE.Vector3(0,0,1) },
+        uColor: { value: new THREE.Vector3(0,0,0.3) },
         uAlpha: { value: 0.5 },
         tDiffuse: { value: null },
       },
@@ -111,12 +114,16 @@ export default function () {
         void main(){
           vec4 tex = texture2D(tDiffuse, vUv);
           // tex.r *= 2.0;
-          tex.rb += vUv;
+          tex.rgb += uColor;
           
           gl_FragColor = tex;
         }
       `,
-    })
+    });
+    gui.add(customShaderPass.uniforms.uColor.value, 'x', -1, 1, 0.01);
+    gui.add(customShaderPass.uniforms.uColor.value, 'y', -1, 1, 0.01);
+    gui.add(customShaderPass.uniforms.uColor.value, 'z', -1, 1, 0.01);
+
     effectComposer.addPass(customShaderPass);
 
     const unRealBloomPass = new UnrealBloomPass(
