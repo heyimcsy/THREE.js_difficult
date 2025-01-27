@@ -194,7 +194,7 @@ export default function () {
 
     const mesh = new THREE.Mesh(
       new THREE.TorusGeometry(0.02, 0.002,20, 20),
-      new THREE.MeshBasicMaterial({color: 0x263d64})
+      new THREE.MeshBasicMaterial({color: 0x263d64, transparent: true})
     );
     mesh.position.set(position.x, position.y, position.z)
     mesh.rotation.set(0.9, 2.46, 1)
@@ -213,7 +213,7 @@ export default function () {
 
     const mesh = new THREE.Mesh(
       new THREE.TorusGeometry(0.02, 0.002,20, 20),
-      new THREE.MeshBasicMaterial({color: 0x263d64})
+      new THREE.MeshBasicMaterial({color: 0x263d64, transparent: true})
     );
     mesh.position.set(position.x, position.y, position.z)
 
@@ -243,7 +243,8 @@ export default function () {
 
     const material = new THREE.MeshBasicMaterial({
       // color: 0x263d64
-      map: texture
+      map: texture,
+      transparent: true,
     })
     const mesh = new THREE.Mesh(geometry, material);
 
@@ -264,6 +265,8 @@ export default function () {
 
     return{
       earthGroup,
+      point1,
+      point2,
       curve,
       star
     }
@@ -286,7 +289,7 @@ export default function () {
   };
 
   const draw = (obj) => {
-    const {earthGroup, curve, star} = obj;
+    const {earthGroup, point1, point2, curve, star} = obj;
 
     earthGroup.rotation.x += 0.0005;
 
@@ -304,6 +307,12 @@ export default function () {
     const speed =  3;
     drawRangeCount = progress * 960 * 3;
     curve.geometry.setDrawRange(0, drawRangeCount);
+
+    if(timeElapsed > 4){
+      point1.material.opacity = 5 - timeElapsed;
+      point2.material.opacity = 5 - timeElapsed;
+      curve.material.opacity = 5 - timeElapsed;
+    }
 
     // renderer.render(scene, camera);
     requestAnimationFrame(() => {
